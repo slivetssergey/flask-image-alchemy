@@ -10,10 +10,11 @@ from .storages import FileStorage, BaseStorage
 class StdImageFile:
     _variations = []
 
-    def __init__(self, storage, json_data):
+    def __init__(self, storage, data, variations={}):
         self._variations.clear()
         self.storage = storage
-        self.json_data = json_data
+        self.data = data
+        self.variations = variations
         self._set_attributes()
 
     def _build_full_url(self, path):
@@ -32,13 +33,16 @@ class StdImageFile:
             )
 
     def _set_attributes(self):
-        original_path = self.json_data.pop("original", None)
+        original_path = self.data
         full_url = self._build_full_url(original_path)
         setattr(self, "url", full_url)
         setattr(self, "path", original_path)
-        for name, url in self.json_data.items():
-            setattr(self, name, StdImageFile(self.storage, {"original": url}))
-            self._variations.append(url)
+        if self.variations:
+            parts = original_path.split('.')
+            for k in self.variations.keys():
+                url = '%s.%s.%s' % (parts[0], k, parts[1])
+                setattr(self, k, StdImageFile(self.storage, url))
+                self._variations.append(url)
 
     def delete(self, variations=False):
         self.storage.delete(self.path)
@@ -49,7 +53,7 @@ class StdImageFile:
 
 class StdImageField(types.TypeDecorator):
 
-    impl = types.JSON
+    impl = types.Unicode
 
     def __init__(self, storage:BaseStorage=FileStorage(), variations:dict=None,
                  upload_to=None, media_path=None, *args, **kwargs):
@@ -67,12 +71,11 @@ class StdImageField(types.TypeDecorator):
             temp_file.write(file.read())
             temp_file.seek(0)
             self.storage.write(temp_file, filename)
-            data = {"original": filename}
+            print(self.variations)
             if self.variations:
-                values = process_thumbnail(file, filename, self.variations, self.storage)
-                data.update({key:value for key, value in values})
-            return data
+                [i for i in process_thumbnail(file, filename, self.variations, self.storage)]
+            return filename
 
     def process_result_value(self, value, dialect):
         if value:
-            return StdImageFile(self.storage, value)
+            return StdImageFile(self.storage, value, self.variations)
