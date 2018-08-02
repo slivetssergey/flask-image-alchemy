@@ -19,14 +19,9 @@ Features
 Installation
 --------------------
 
-To install use pip:
+Clone the repo:
 ```bash
-$ pip install Flask-ImageAlchemy
-```
-
-Or clone the repo:
-```bash
-$ git clone https://github.com/rstit/flask-image-alchemy.git
+$ git clone https://github.com/slivetssergey/flask-image-alchemy.git
 $ python setup.py install
 ```
 Usage
