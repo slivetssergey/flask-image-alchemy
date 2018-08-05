@@ -43,13 +43,14 @@ class S3Storage(BaseStorage):
         self.SECRET = app.config.get('AWS_SECRET_ACCESS_KEY')
         self.REGION_NAME = app.config.get('AWS_REGION_NAME')
         self.BUCKET_NAME = app.config.get('S3_BUCKET_NAME')
+        self.BUCKET_DOMAIN = app.config.get('S3_BUCKET_DOMAIN')
         self.config = config if config else Config(signature_version='s3v4')
 
     def read(self, file_name):
         self.client.download_fileobj(self.BUCKET_NAME, file_name)
 
     def write(self, data, file_name):
-        self.client.upload_fileobj(data, self.BUCKET_NAME, file_name)
+        self.client.upload_fileobj(data, self.BUCKET_NAME, file_name, ExtraArgs={'ACL': 'public-read'})
 
     def delete(self, file_name):
         self.client.delete_object(Bucket=self.BUCKET_NAME, Key=file_name)

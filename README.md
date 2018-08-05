@@ -50,6 +50,7 @@ AWS_ACCESS_KEY_ID = "you-api-key"
 AWS_SECRET_ACCESS_KEY = "you-secret-key"
 AWS_REGION_NAME = "bucket-region"
 S3_BUCKET_NAME = "bucket-name"
+S3_BUCKET_DOMAIN = "bucket-domain"
 ```
 
 If you need FileStorage and custom `MEDIA_PATH`:

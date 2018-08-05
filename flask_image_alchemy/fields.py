@@ -25,12 +25,19 @@ class StdImageFile:
                 path=path
             )
         else:
-            url = "https://{bucket_name}.s3-{region_name}.amazonaws.com/{path}"
-            return url.format(
-                region_name=self.storage.REGION_NAME,
-                bucket_name=self.storage.BUCKET_NAME,
-                path=path
-            )
+            if self.storage.BUCKET_DOMAIN:
+                url = "https://{bucket_domain}/{path}"
+                return url.format(
+                    bucket_domain=self.storage.BUCKET_DOMAIN,
+                    path=path
+                )
+            else:
+                url = "https://{bucket_name}.s3-{region_name}.amazonaws.com/{path}"
+                return url.format(
+                    region_name=self.storage.REGION_NAME,
+                    bucket_name=self.storage.BUCKET_NAME,
+                    path=path
+                )
 
     def _set_attributes(self):
         original_path = self.data
